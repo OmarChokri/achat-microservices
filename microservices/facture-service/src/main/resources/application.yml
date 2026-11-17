@@ -1,0 +1,32 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: facture-service
+  config:
+    import: optional:configserver:http://localhost:8888
+  datasource:
+    url: ${FACTURE_DB_URL:jdbc:mysql://localhost:3308/achat_factures?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${FACTURE_DB_USERNAME:facture_user}
+    password: ${FACTURE_DB_PASSWORD:facture-local-password}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}

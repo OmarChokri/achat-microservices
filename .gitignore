@@ -22,5 +22,7 @@ crash.log
 # Agent
 .agent
 
+/microservices/**/target/
+
 aws/credentials
 ci/aws-env.sh

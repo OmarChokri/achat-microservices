@@ -1,0 +1,35 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+resilience4j:
+  retry:
+    instances:
+      productService:
+        max-attempts: 3
+        wait-duration: 500ms
+        enable-exponential-backoff: false
+  ratelimiter:
+    instances:
+      productService:
+        limit-for-period: 5
+        limit-refresh-period: 1s
+        timeout-duration: 0
+  circuitbreaker:
+    instances:
+      productService:
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        register-health-indicator: true

@@ -1,0 +1,68 @@
+name: achat-cqrs
+
+services:
+  mysql-cqrs:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: achat_cqrs
+      MYSQL_USER: ${CQRS_DB_USERNAME:-cqrs_user}
+      MYSQL_PASSWORD: ${CQRS_DB_PASSWORD:-cqrs-local-password}
+      MYSQL_ROOT_PASSWORD: ${CQRS_MYSQL_ROOT_PASSWORD:-cqrs-root-local-password}
+    ports:
+      - "3307:3306"
+    volumes:
+      - cqrs-mysql-data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h 127.0.0.1 -u$${MYSQL_USER} -p$${MYSQL_PASSWORD} --silent"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  mysql-factures:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: achat_factures
+      MYSQL_USER: ${FACTURE_DB_USERNAME:-facture_user}
+      MYSQL_PASSWORD: ${FACTURE_DB_PASSWORD:-facture-local-password}
+      MYSQL_ROOT_PASSWORD: ${FACTURE_MYSQL_ROOT_PASSWORD:-facture-root-local-password}
+    ports:
+      - "3308:3306"
+    volumes:
+      - facture-mysql-data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h 127.0.0.1 -u$${MYSQL_USER} -p$${MYSQL_PASSWORD} --silent"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  axon-server:
+    image: axoniq/axonserver:2024.2.4
+    restart: unless-stopped
+    environment:
+      AXONIQ_AXONSERVER_STANDALONE: "true"
+    ports:
+      - "8024:8024"
+      - "8124:8124"
+    volumes:
+      - axon-server-data:/axonserver/data
+      - axon-server-events:/axonserver/events
+      - axon-server-config:/axonserver/config
+
+volumes:
+  cqrs-mysql-data:
+  axon-server-data:
+  axon-server-events:
+  axon-server-config:
+  facture-mysql-data:

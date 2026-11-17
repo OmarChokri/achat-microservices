@@ -1,0 +1,36 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: order-service
+  config:
+    import: optional:configserver:http://localhost:8888
+  datasource:
+    url: ${CQRS_DB_URL:jdbc:mysql://localhost:3307/achat_cqrs?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${CQRS_DB_USERNAME:cqrs_user}
+    password: ${CQRS_DB_PASSWORD:cqrs-local-password}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  flyway:
+    enabled: true
+
+axon:
+  axonserver:
+    servers: ${AXON_SERVER:localhost:8124}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
